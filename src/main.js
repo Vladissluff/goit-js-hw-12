@@ -4,14 +4,14 @@ import { axiosImages } from "./js/pixabay-api";
 import { displayImages } from "./js/render-functions";
 
 const form = document.querySelector("form");
-const loadingMessage = document.querySelector(".loader");
+const loadingMessage = document.querySelector(".loader-first");
 const loadingBottom = document.querySelector(".loader-bottom");
 const btnLoadMore = document.querySelector(".btn-loadmore");
+const gallery = document.querySelector(".gallery");
 
 let currentPage = 1;
 let previousSearch = "";
 let userQuery = "";
-let totalHits = 0;
 
 form.addEventListener("submit", async (evt) => {
     evt.preventDefault();
@@ -19,7 +19,7 @@ form.addEventListener("submit", async (evt) => {
     const input = evt.target.querySelector("input");
     const inputValue = input.value.trim();
 
-    if (inputValue === "") {
+    if (!inputValue) {
         iziToast.error({
             message: "Please fill in the field!",
             position: "topRight",
@@ -34,33 +34,32 @@ form.addEventListener("submit", async (evt) => {
     if (inputValue !== previousSearch) {
         currentPage = 1;
         previousSearch = inputValue;
+        gallery.innerHTML = ""; 
     }
 
-    if (loadingMessage) {
-        loadingMessage.style.display = "block";
-        console.log("Loading message shown");
-    };
+    loadingMessage.style.display = "block"; 
     btnLoadMore.style.display = "none";
 
     try {
         const { images, totalHits } = await axiosImages(userQuery, currentPage);
 
-        if (!images || images.length === 0) {
+        if (!images.length) {
             iziToast.warning({
-                message: "Sorry, there are no images matching your search query. Please try again!",
+                message: "No images found. Try again!",
                 position: "topRight",
                 messageColor: "#FAFAFB",
                 backgroundColor: "#EF4040"
             });
+            gallery.innerHTML = ""; 
             return;
         }
 
         displayImages(images, currentPage);
 
-        if (currentPage * 40 >= totalHits) {
+        if (currentPage * 15 >= totalHits) {
             btnLoadMore.style.display = "none";
             iziToast.error({
-                message: "We're sorry, but you've reached the end of search results.",
+                message: "You've reached the end of search results.",
                 position: "topRight",
                 messageColor: "#FAFAFB",
                 backgroundColor: "#EF4040"
@@ -73,39 +72,33 @@ form.addEventListener("submit", async (evt) => {
 
     } catch (error) {
         iziToast.error({
-            message: "Error",
+            message: "Error fetching images",
             position: "topRight",
             messageColor: "#FAFAFB",
             backgroundColor: "#EF4040"
         });
     } finally {
-        if (loadingMessage) {
-            loadingMessage.style.display = "none";
-        }
-    };
+        loadingMessage.style.display = "none"; 
+    }
 
     form.reset();
 });
 
-
 btnLoadMore.addEventListener("click", async () => {
-    if (loadingBottom) {
-        btnLoadMore.style.display = "none";
-        loadingBottom.style.display = "block";
-        console.log("Loading bottom message shown");
-    };
+    btnLoadMore.style.display = "none";
+    loadingBottom.style.display = "block"; 
 
     try {
         const { images, totalHits } = await axiosImages(userQuery, currentPage);
 
-        if (images && images.length > 0) {
+        if (images.length) {
             displayImages(images, currentPage);
             currentPage++;
 
-            if (currentPage * 40 >= totalHits) {
+            if (currentPage * 15 >= totalHits) {
                 btnLoadMore.style.display = "none";
                 iziToast.error({
-                    message: "We're sorry, but you've reached the end of search results.",
+                    message: "You've reached the end of search results.",
                     position: "topRight",
                     messageColor: "#FAFAFB",
                     backgroundColor: "#EF4040"
@@ -122,11 +115,9 @@ btnLoadMore.addEventListener("click", async () => {
             backgroundColor: "#EF4040"
         });
     } finally {
-        if (loadingBottom) {
-            loadingBottom.style.display = "none";
-            btnLoadMore.style.display = "block";
-        }
-    };
+        loadingBottom.style.display = "none";
+        btnLoadMore.style.display = "block";
+    }
 });
 
 function scrollToNextImages() {
