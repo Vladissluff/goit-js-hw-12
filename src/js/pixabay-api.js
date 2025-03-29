@@ -13,7 +13,7 @@ export async function axiosImages(query, currentPage = 1) {
                 orientation: "horizontal",
                 safesearch: "true",
                 page: currentPage,
-                per_page: 40
+                per_page: 15 
             },
         });
 
@@ -23,12 +23,6 @@ export async function axiosImages(query, currentPage = 1) {
         };
     } catch (error) {
         console.error("Error fetching images:", error);
-        iziToast.error({
-            message: "An error occurred while fetching images. Please try again!",
-            position: "topRight",
-            messageColor: "#FAFAFB",
-            backgroundColor: "#EF4040"
-        });
         return { images: [], totalHits: 0 };
     }
 }
