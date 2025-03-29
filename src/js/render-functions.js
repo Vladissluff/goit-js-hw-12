@@ -2,15 +2,17 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const gallery = document.querySelector(".gallery");
+const lightbox = new SimpleLightbox(".gallery a", { 
+    captionsData: "alt",
+    captionDelay: 250,
+});
 
 export function displayImages(images, currentPage) {
     if (currentPage === 1) {
-        gallery.innerHTML = "";
+        gallery.innerHTML = ""; 
     }
 
-    const markup = images
-        .map(
-            (image) => `
+    const markup = images.map(image => `
         <li class="img-card">
             <a href="${image.largeImageURL}">
                 <img 
@@ -25,16 +27,10 @@ export function displayImages(images, currentPage) {
                 <p><strong>Comments:</strong> ${image.comments}</p>
                 <p><strong>Downloads:</strong> ${image.downloads}</p>
             </div>
-        </li>`
-        )
-        .join("");
+        </li>
+    `).join("");
 
     gallery.insertAdjacentHTML('beforeend', markup);
 
-    const lightbox = new SimpleLightbox(".gallery a", {
-        captionsData: "alt",
-        captionDelay: 250,
-    });
-
-    lightbox.refresh();
+    lightbox.refresh(); 
 }
